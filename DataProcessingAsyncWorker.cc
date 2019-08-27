@@ -25,6 +25,7 @@ DataProcessingAsyncWorker::DataProcessingAsyncWorker(int count,
 
                                                                            //    result(Object::New(Env())),
                                                                            pointerToResponse(new std::string[count]),
+                                                                           pointerToResponseIds(new std::string[count]),
                                                                            count(count)
 //    dataRef(ObjectReference::New(count, 1)),
 //    dataPtr(data.Data()),
@@ -70,25 +71,7 @@ std::string mongoObjectId()
 void DataProcessingAsyncWorker::Execute()
 {
 
-    std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;
-    // napi_value tempString;
-    // napi_value qrcodeArray;
-    // napi_create_array_with_length(this->Env(), count, &qrcodeArray);
-    // std::string tempArray[count];
-    // pointerToResponse = tempArray;
-
-    std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;
-
-    // std::random_device rd;
-    //    auto seed_data = std::array<int, std::mt19937::state_size> {};
-    //    std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
-    //    std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
-    //    std::mt19937 generator(seq);
-
-    //    uuid const guid = uuids::uuid_random_generator{generator}();
-
-    // to check dublicates
-    // std::vector<std::string> name;
+    // std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;
 
     for (int i = 0; i < count; i++)
     {
@@ -109,7 +92,8 @@ void DataProcessingAsyncWorker::Execute()
         // const QrCode qr = QrCode::encodeText(text, errCorLvl);
 
         pointerToResponse[i] = qr.toSvgString(1);
-            // std::cout << pointerToResponse[i]  << std::endl;
+        pointerToResponseIds[i] = tempId;
+        // std::cout << pointerToResponse[i]  << std::endl;
 
         // napi_create_string_utf8(this->Env(), qr.toSvgString(1).c_str(), NAPI_AUTO_LENGTH, &tempString);
         // napi_set_element(this->Env(), qrcodeArray, i, tempString);
@@ -136,13 +120,20 @@ void DataProcessingAsyncWorker::OnOK()
     // std::cout << "DataProcessingAsyncWorker: " << pointerToResponse[0] << std::endl;
     //! covert c++ array to js array, since js type cannot be used in execute and multitreading is only done for code written in execute
     napi_value tempString;
+    napi_value tempStringId;
     napi_value qrcodeArray;
+
     napi_create_array_with_length(this->Env(), count, &qrcodeArray);
 
     for (int i = 0; i < count; i++)
     {
+        Napi::Object obj = Napi::Object::New(this->Env());
         napi_create_string_utf8(this->Env(), pointerToResponse[i].c_str(), NAPI_AUTO_LENGTH, &tempString);
-        napi_set_element(this->Env(), qrcodeArray, i, tempString);
+        napi_create_string_utf8(this->Env(), pointerToResponseIds[i].c_str(), NAPI_AUTO_LENGTH, &tempStringId);
+
+        obj.Set(Napi::String::New(this->Env(), "svg"), tempString);
+        obj.Set(Napi::String::New(this->Env(), "id"), tempStringId);
+        napi_set_element(this->Env(), qrcodeArray, i, obj);
     }
 
     Callback().Call({
