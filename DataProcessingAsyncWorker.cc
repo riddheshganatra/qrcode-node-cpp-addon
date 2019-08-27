@@ -24,8 +24,8 @@ DataProcessingAsyncWorker::DataProcessingAsyncWorker(int count,
                                                                            // responseData(Napi::Persistent(Napi::Object::New(Env()))),
 
                                                                            //    result(Object::New(Env())),
-                                                                           pointerToResponse(new std::string[count]),
-                                                                           pointerToResponseIds(new std::string[count]),
+                                                                           pointerToSvgs(new std::string[count]),
+                                                                           pointerToUids(new std::string[count]),
                                                                            count(count)
 //    dataRef(ObjectReference::New(count, 1)),
 //    dataPtr(data.Data()),
@@ -75,6 +75,7 @@ void DataProcessingAsyncWorker::Execute()
 
     for (int i = 0; i < count; i++)
     {
+        // generate new uuid
         std::string tempId = mongoObjectId();
         // to check dublicates
         //     if (std::find(name.begin(), name.end(), tempId) == name.end()) {
@@ -86,54 +87,35 @@ void DataProcessingAsyncWorker::Execute()
 
         // }
 
-        // const char *text = "Hello, world! asdbasdjhagsdjha sdhgajhsdgajhsgdjhagsdjhagsjd asgdhjagsdjhagsdasd"; // User-supplied text
+        // new qrcode
         const QrCode::Ecc errCorLvl = QrCode::Ecc::MEDIUM;
         const QrCode qr = QrCode::encodeText(tempId.c_str(), errCorLvl);
-        // const QrCode qr = QrCode::encodeText(text, errCorLvl);
 
-        pointerToResponse[i] = qr.toSvgString(1);
-        pointerToResponseIds[i] = tempId;
-        // std::cout << pointerToResponse[i]  << std::endl;
-
-        // napi_create_string_utf8(this->Env(), qr.toSvgString(1).c_str(), NAPI_AUTO_LENGTH, &tempString);
-        // napi_set_element(this->Env(), qrcodeArray, i, tempString);
-
-        // napi_create_string_utf8(this->Env(), qr.toSvgString(1).c_str(), NAPI_AUTO_LENGTH, &tempString);
-
-        // responseData.Set(i, qr.toSvgString(1));
-        // responseData.Set(i, tempString);
-        // Receiver().Set("test", Napi::Object::New(Env())
-        // napi_set_element(this->Env(), responseData, i, tempString);
+        // push qrcode and id to array so they can be converted to js object in onOk()
+        pointerToSvgs[i] = qr.toSvgString(1);
+        pointerToUids[i] = tempId;
     }
-    // napi_value tempString;
-
-    //
-    // for (size_t i = 0; i < dataLength; i++)
-    // {
-    //     uint8_t value = *(dataPtr + i);
-    //     *(dataPtr + i) = value * 2;
-    // }
 }
 
 void DataProcessingAsyncWorker::OnOK()
 {
     // std::cout << "DataProcessingAsyncWorker: " << pointerToResponse[0] << std::endl;
     //! covert c++ array to js array, since js type cannot be used in execute and multitreading is only done for code written in execute
-    napi_value tempString;
-    napi_value tempStringId;
+    napi_value svgString;
+    napi_value uid;
     napi_value qrcodeArray;
 
     napi_create_array_with_length(this->Env(), count, &qrcodeArray);
 
     for (int i = 0; i < count; i++)
     {
-        Napi::Object obj = Napi::Object::New(this->Env());
-        napi_create_string_utf8(this->Env(), pointerToResponse[i].c_str(), NAPI_AUTO_LENGTH, &tempString);
-        napi_create_string_utf8(this->Env(), pointerToResponseIds[i].c_str(), NAPI_AUTO_LENGTH, &tempStringId);
+        Napi::Object tempObj = Napi::Object::New(this->Env());
+        napi_create_string_utf8(this->Env(), pointerToSvgs[i].c_str(), NAPI_AUTO_LENGTH, &svgString);
+        napi_create_string_utf8(this->Env(), pointerToUids[i].c_str(), NAPI_AUTO_LENGTH, &uid);
 
-        obj.Set(Napi::String::New(this->Env(), "svg"), tempString);
-        obj.Set(Napi::String::New(this->Env(), "id"), tempStringId);
-        napi_set_element(this->Env(), qrcodeArray, i, obj);
+        tempObj.Set(Napi::String::New(this->Env(), "svg"), svgString);
+        tempObj.Set(Napi::String::New(this->Env(), "id"), uid);
+        napi_set_element(this->Env(), qrcodeArray, i, tempObj);
     }
 
     Callback().Call({

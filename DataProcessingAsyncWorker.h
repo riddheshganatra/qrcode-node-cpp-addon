@@ -18,7 +18,7 @@ class DataProcessingAsyncWorker : public AsyncWorker
         // size_t dataLength;
         // Napi::ObjectReference responseData;
         // std::string responseData[];
-        std::string *pointerToResponse;
-        std::string *pointerToResponseIds;
+        std::string *pointerToSvgs;
+        std::string *pointerToUids;
         int count;
 };
