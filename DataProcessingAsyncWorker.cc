@@ -80,8 +80,9 @@ void DataProcessingAsyncWorker::Execute()
     for (int i = 0; i < count; i++)
     {
         // generate new uuid
-        std::string tempId = mongoObjectId();
-            std::cout << "uuid " <<tempId  << std::endl;
+        pointerToUids[i] = mongoObjectId();
+         
+        pointerToHashedUids[i]=picosha2::hash256_hex_string(pointerToUids[i]);
             // std::cout << "hash " <<picosha2::hash256_hex_string(tempId)  << std::endl;
 
             // std::cout << "hash " <<std::hash<std::string>{}(tempId)  << std::endl;
@@ -97,12 +98,10 @@ void DataProcessingAsyncWorker::Execute()
 
         // new qrcode
         const QrCode::Ecc errCorLvl = QrCode::Ecc::MEDIUM;
-        const QrCode qr = QrCode::encodeText(tempId.c_str(), errCorLvl);
+        const QrCode qr = QrCode::encodeText(pointerToHashedUids[i].c_str(), errCorLvl);
 
         // push qrcode and id to array so they can be converted to js object in onOk()
         pointerToSvgs[i] = qr.toSvgString(1);
-        pointerToUids[i] = tempId;
-        pointerToHashedUids[i]=picosha2::hash256_hex_string(tempId);
     }
 }
 
