@@ -1,0 +1,169 @@
+#include <DataProcessingAsyncWorker.h>
+// #include "uuid.h"
+#include "BitBuffer.hpp"
+#include <string.h>
+#include "QrCode.hpp"
+#include <iostream>
+// #include "uuid.h"
+#include <vector>
+#include <random>
+#include <sstream>
+#include <string>
+#include <chrono>
+// #include <bits/stdc++.h>
+
+// using namespace uuids;
+using namespace std::chrono;
+using qrcodegen::QrCode;
+using qrcodegen::QrSegment;
+
+DataProcessingAsyncWorker::DataProcessingAsyncWorker(int count,
+                                                     Function &callback) : AsyncWorker(callback),
+                                                                           //  nativeResponse(tempArray[count]),
+                                                                           // responseData(std::string[count]),
+                                                                           // responseData(Napi::Persistent(Napi::Object::New(Env()))),
+
+                                                                           //    result(Object::New(Env())),
+                                                                           pointerToResponse(new std::string[count]),
+                                                                           count(count)
+//    dataRef(ObjectReference::New(count, 1)),
+//    dataPtr(data.Data()),
+//    dataLength(data.Length())
+{
+    // pointerToResponse = new std::string [count];
+}
+unsigned int random_char()
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, 255);
+    return dis(gen);
+}
+
+std::string intToHex(int number)
+{
+    std::stringstream sstream;
+    sstream << std::hex << number;
+    std::string result = sstream.str();
+    // std::cout << number << ":"<< result << "\n";
+
+    return result;
+}
+std::string mongoObjectId()
+{
+    milliseconds ms = duration_cast<milliseconds>(
+        system_clock::now().time_since_epoch());
+    std::string result = intToHex(ms.count() / 1000);
+    // random generation
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_int_distribution<int> dist(0, 15);
+    for (int i = 0; i < 16; ++i)
+    {
+        // std::cout << intToHex(dist(mt)) << "\n";
+        result.append(intToHex(dist(mt)));
+    }
+
+    return result;
+}
+
+std::string generate_hex(const unsigned int len)
+{
+    std::stringstream ss;
+    for (auto i = 0; i < len; i++)
+    {
+        const auto rc = random_char();
+        std::stringstream hexstream;
+        hexstream << std::hex << rc;
+        auto hex = hexstream.str();
+        ss << (hex.length() < 2 ? '0' + hex : hex);
+    }
+    return ss.str();
+}
+
+void DataProcessingAsyncWorker::Execute()
+{
+
+    std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;
+    // napi_value tempString;
+    // napi_value qrcodeArray;
+    // napi_create_array_with_length(this->Env(), count, &qrcodeArray);
+    // std::string tempArray[count];
+    // pointerToResponse = tempArray;
+
+    std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;
+
+    // std::random_device rd;
+    //    auto seed_data = std::array<int, std::mt19937::state_size> {};
+    //    std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
+    //    std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
+    //    std::mt19937 generator(seq);
+
+    //    uuid const guid = uuids::uuid_random_generator{generator}();
+
+    // to check dublicates
+    // std::vector<std::string> name;
+
+    for (int i = 0; i < count; i++)
+    {
+        std::string tempId = mongoObjectId();
+        // to check dublicates
+        //     if (std::find(name.begin(), name.end(), tempId) == name.end()) {
+        //     // std::cout << "uuid " <<tempId  << std::endl;
+        //   // someName not in name, add it
+        //   name.push_back(tempId);
+        // }else{
+        //     std::cout << "dublicate uuid " <<tempId  << std::endl;
+
+        // }
+
+        // const char *text = "Hello, world! asdbasdjhagsdjha sdhgajhsdgajhsgdjhagsdjhagsjd asgdhjagsdjhagsdasd"; // User-supplied text
+        const QrCode::Ecc errCorLvl = QrCode::Ecc::MEDIUM;
+        const QrCode qr = QrCode::encodeText(tempId.c_str(), errCorLvl);
+        // const QrCode qr = QrCode::encodeText(text, errCorLvl);
+
+        pointerToResponse[i] = qr.toSvgString(1);
+            // std::cout << pointerToResponse[i]  << std::endl;
+
+        // napi_create_string_utf8(this->Env(), qr.toSvgString(1).c_str(), NAPI_AUTO_LENGTH, &tempString);
+        // napi_set_element(this->Env(), qrcodeArray, i, tempString);
+
+        // napi_create_string_utf8(this->Env(), qr.toSvgString(1).c_str(), NAPI_AUTO_LENGTH, &tempString);
+
+        // responseData.Set(i, qr.toSvgString(1));
+        // responseData.Set(i, tempString);
+        // Receiver().Set("test", Napi::Object::New(Env())
+        // napi_set_element(this->Env(), responseData, i, tempString);
+    }
+    // napi_value tempString;
+
+    //
+    // for (size_t i = 0; i < dataLength; i++)
+    // {
+    //     uint8_t value = *(dataPtr + i);
+    //     *(dataPtr + i) = value * 2;
+    // }
+}
+
+void DataProcessingAsyncWorker::OnOK()
+{
+    // std::cout << "DataProcessingAsyncWorker: " << pointerToResponse[0] << std::endl;
+    //! covert c++ array to js array, since js type cannot be used in execute and multitreading is only done for code written in execute
+    napi_value tempString;
+    napi_value qrcodeArray;
+    napi_create_array_with_length(this->Env(), count, &qrcodeArray);
+
+    for (int i = 0; i < count; i++)
+    {
+        napi_create_string_utf8(this->Env(), pointerToResponse[i].c_str(), NAPI_AUTO_LENGTH, &tempString);
+        napi_set_element(this->Env(), qrcodeArray, i, tempString);
+    }
+
+    Callback().Call({
+        qrcodeArray
+        // Napi::Value(), //segfault
+        //        responseData //promise with: Invalid pointer passed as argument
+    });
+
+    // dataRef.Unref();
+}
