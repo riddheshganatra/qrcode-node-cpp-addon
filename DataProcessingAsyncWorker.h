@@ -20,5 +20,6 @@ class DataProcessingAsyncWorker : public AsyncWorker
         // std::string responseData[];
         std::string *pointerToSvgs;
         std::string *pointerToUids;
+        std::string *pointerToHashedUids;
         int count;
 };

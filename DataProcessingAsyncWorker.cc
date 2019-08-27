@@ -10,6 +10,7 @@
 #include <sstream>
 #include <string>
 #include <chrono>
+#include "picosha2.h"
 // #include <bits/stdc++.h>
 
 // using namespace uuids;
@@ -26,6 +27,7 @@ DataProcessingAsyncWorker::DataProcessingAsyncWorker(int count,
                                                                            //    result(Object::New(Env())),
                                                                            pointerToSvgs(new std::string[count]),
                                                                            pointerToUids(new std::string[count]),
+                                                                           pointerToHashedUids(new std::string[count]),
                                                                            count(count)
 //    dataRef(ObjectReference::New(count, 1)),
 //    dataPtr(data.Data()),
@@ -73,10 +75,16 @@ void DataProcessingAsyncWorker::Execute()
 
     // std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;
 
+
+
     for (int i = 0; i < count; i++)
     {
         // generate new uuid
         std::string tempId = mongoObjectId();
+            std::cout << "uuid " <<tempId  << std::endl;
+            // std::cout << "hash " <<picosha2::hash256_hex_string(tempId)  << std::endl;
+
+            // std::cout << "hash " <<std::hash<std::string>{}(tempId)  << std::endl;
         // to check dublicates
         //     if (std::find(name.begin(), name.end(), tempId) == name.end()) {
         //     // std::cout << "uuid " <<tempId  << std::endl;
@@ -94,6 +102,7 @@ void DataProcessingAsyncWorker::Execute()
         // push qrcode and id to array so they can be converted to js object in onOk()
         pointerToSvgs[i] = qr.toSvgString(1);
         pointerToUids[i] = tempId;
+        pointerToHashedUids[i]=picosha2::hash256_hex_string(tempId);
     }
 }
 
@@ -103,6 +112,7 @@ void DataProcessingAsyncWorker::OnOK()
     //! covert c++ array to js array, since js type cannot be used in execute and multitreading is only done for code written in execute
     napi_value svgString;
     napi_value uid;
+    napi_value hashedUid;
     napi_value qrcodeArray;
 
     napi_create_array_with_length(this->Env(), count, &qrcodeArray);
@@ -112,9 +122,11 @@ void DataProcessingAsyncWorker::OnOK()
         Napi::Object tempObj = Napi::Object::New(this->Env());
         napi_create_string_utf8(this->Env(), pointerToSvgs[i].c_str(), NAPI_AUTO_LENGTH, &svgString);
         napi_create_string_utf8(this->Env(), pointerToUids[i].c_str(), NAPI_AUTO_LENGTH, &uid);
+        napi_create_string_utf8(this->Env(), pointerToHashedUids[i].c_str(), NAPI_AUTO_LENGTH, &hashedUid);
 
         tempObj.Set(Napi::String::New(this->Env(), "svg"), svgString);
         tempObj.Set(Napi::String::New(this->Env(), "id"), uid);
+        tempObj.Set(Napi::String::New(this->Env(), "hash"), hashedUid);
         napi_set_element(this->Env(), qrcodeArray, i, tempObj);
     }
 
