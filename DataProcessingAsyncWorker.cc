@@ -97,11 +97,11 @@ void DataProcessingAsyncWorker::Execute()
         // }
 
         // new qrcode
-        const QrCode::Ecc errCorLvl = QrCode::Ecc::MEDIUM;
+        const QrCode::Ecc errCorLvl = QrCode::Ecc::LOW;
         const QrCode qr = QrCode::encodeText(pointerToHashedUids[i].c_str(), errCorLvl);
 
         // push qrcode and id to array so they can be converted to js object in onOk()
-        pointerToSvgs[i] = qr.toSvgString(1);
+        pointerToSvgs[i] = qr.toSvgString(0);
     }
 }
 
