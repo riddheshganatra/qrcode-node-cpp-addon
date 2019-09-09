@@ -1,8 +1,6 @@
 #include <DataProcessingAsyncWorker.h>
 // #include "uuid.h"
-#include "BitBuffer.hpp"
 #include <string.h>
-#include "QrCode.hpp"
 #include <iostream>
 // #include "uuid.h"
 #include <vector>
@@ -11,12 +9,12 @@
 #include <string>
 #include <chrono>
 #include "picosha2.h"
+
+
 // #include <bits/stdc++.h>
 
 // using namespace uuids;
 using namespace std::chrono;
-using qrcodegen::QrCode;
-using qrcodegen::QrSegment;
 
 DataProcessingAsyncWorker::DataProcessingAsyncWorker(int count,
                                                      Function &callback) : AsyncWorker(callback),
@@ -75,17 +73,15 @@ void DataProcessingAsyncWorker::Execute()
 
     // std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;
 
-
-
     for (int i = 0; i < count; i++)
     {
         // generate new uuid
         pointerToUids[i] = mongoObjectId();
-         
-        pointerToHashedUids[i]=picosha2::hash256_hex_string(pointerToUids[i]);
-            // std::cout << "hash " <<picosha2::hash256_hex_string(tempId)  << std::endl;
 
-            // std::cout << "hash " <<std::hash<std::string>{}(tempId)  << std::endl;
+        pointerToHashedUids[i] = picosha2::hash256_hex_string(pointerToUids[i]);
+        // std::cout << "hash " <<picosha2::hash256_hex_string(tempId)  << std::endl;
+
+        // std::cout << "hash " <<std::hash<std::string>{}(tempId)  << std::endl;
         // to check dublicates
         //     if (std::find(name.begin(), name.end(), tempId) == name.end()) {
         //     // std::cout << "uuid " <<tempId  << std::endl;
@@ -97,11 +93,35 @@ void DataProcessingAsyncWorker::Execute()
         // }
 
         // new qrcode
-        const QrCode::Ecc errCorLvl = QrCode::Ecc::LOW;
-        const QrCode qr = QrCode::encodeText(pointerToHashedUids[i].c_str(), errCorLvl);
+        // const QrCode::Ecc errCorLvl = QrCode::Ecc::LOW;
+        // const QrCode qr = QrCode::encodeText(pointerToHashedUids[i].c_str(), errCorLvl);
 
         // push qrcode and id to array so they can be converted to js object in onOk()
-        pointerToSvgs[i] = qr.toSvgString(0);
+        pointerToSvgs[i] = "static";
+
+
+       
+        // const uint8_t PIXELS[] = {
+        //     0xFF,
+        //     0x00,
+        //     0x00,
+        //     0x00,
+        //     0xFF,
+        //     0x00,
+        //     0x00,
+        //     0x00,
+        //     0xFF,
+        //     0xFF,
+        //     0x00,
+        //     0xFF,
+        //     0xFF,
+        //     0xFF,
+        //     0x00,
+        //     0x00,
+        //     0xFF,
+        //     0xFF,
+        // };
+        
     }
 }
 

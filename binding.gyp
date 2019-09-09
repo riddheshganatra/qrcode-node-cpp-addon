@@ -2,7 +2,7 @@
   'targets': [
     {
       'target_name': 'addon',
-      'sources': [ 'Addon.cc', 'DataProcessingAsyncWorker.cc', 'QrCode.cpp', 'QrSegment.cpp', 'BitBuffer.cpp' ],
+      'sources': [ 'Addon.cc', 'DataProcessingAsyncWorker.cc' ],
       "conditions":[
                 ['OS=="mac"',{
                     'xcode_settings':{
