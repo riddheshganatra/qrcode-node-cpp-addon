@@ -2,7 +2,8 @@
   'targets': [
     {
       'target_name': 'addon',
-      'sources': [ 'Addon.cc', 'DataProcessingAsyncWorker.cc' ],
+      'sources': [ 'Addon.cc', 'DataProcessingAsyncWorker.cc','base64.cc' ],
+     "libraries": ["-lqrencode", "-lpng"],
       "conditions":[
                 ['OS=="mac"',{
                     'xcode_settings':{

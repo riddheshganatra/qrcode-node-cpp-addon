@@ -11,7 +11,6 @@
 #include "picosha2.h"
 #include <qrencode.h>
 #include <png.h>
-#include "base64.h"
 
 
 // #include <bits/stdc++.h>
@@ -247,20 +246,14 @@ png_plte = (png_colorp) malloc(sizeof(png_color) * 2);
 		delete[] row;
 		free(png_plte);
 
-        // std::cout << bp->data << "\n";
-        std::string ret(bp->data, bp->size);
-        // std::cout << ret << "\n";
-        // std::cout << base64_encode(bp->data, bp->size) << "\n";
-        // std::cout << base64_encode(reinterpret_cast<const unsigned char*>(ret.c_str()), ret.length()) << "\n";
-        // reinterpret_cast<const unsigned char*>(s.c_str()), s.length())
-        std::cout << "after bp" << "\n";
+        std::cout << bp << "\n";
 
 	delete params;
 
 
 
         // push qrcode and id to array so they can be converted to js object in onOk()
-        pointerToSvgs[i] = base64_encode(reinterpret_cast<const unsigned char*>(ret.c_str()), ret.length());
+        pointerToSvgs[i] = "static";
 
 
        
