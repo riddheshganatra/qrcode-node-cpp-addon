@@ -7,9 +7,9 @@ const addon = require('bindings')('addon.node');
 // const buf = fs.readFileSync('test-data');
 let done = 0;
 console.time(`process`)
-for (let i = 0; i < 1; i++) {
-    addon.processData(1, (res) => {
-        console.log(res);
+for (let i = 0; i < 5; i++) {
+    addon.processData(1000, (res) => {
+        // console.log(res);
         // console.log(res[0].svg.toString('base64'));
         // fs.writeFile(`./test${done}.svg`,res[0].svg, function(err) {
         //     if(err) {
@@ -19,9 +19,9 @@ for (let i = 0; i < 1; i++) {
         //     console.log(`./test${done}.svg`);
         // }); 
         
-        console.log("done");
+        // console.log("done");
         done = done + 1;
-        if (done == 1) {
+        if (done == 5) {
             console.timeEnd(`process`)
         }
     });

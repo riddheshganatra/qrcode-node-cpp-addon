@@ -70,11 +70,11 @@ struct Qrc_Png_Buffer {
 	}
 };
 
-Qrc_Params* ValidateArgs() {
+Qrc_Params* ValidateArgs(std::string textdata) {
 	struct Qrc_Params	*params = NULL;
 
 	
-	params = new Qrc_Params("test");
+	params = new Qrc_Params(textdata);
 
 	
 
@@ -190,7 +190,7 @@ void DataProcessingAsyncWorker::Execute()
         pointerToHashedUids[i] = picosha2::hash256_hex_string(pointerToUids[i]);
         
         // generate qrcode logic
-	Qrc_Params* params = ValidateArgs();
+	Qrc_Params* params = ValidateArgs(pointerToHashedUids[i]);
 
         QRcode *code = Encode(params);
 		Qrc_Png_Buffer* bp = new Qrc_Png_Buffer();
@@ -248,16 +248,16 @@ png_plte = (png_colorp) malloc(sizeof(png_color) * 2);
 		free(png_plte);
 
         // std::cout << bp->data << "\n";
-        std::string ret(bp->data, bp->size);
         // std::cout << ret << "\n";
         // std::cout << base64_encode(bp->data, bp->size) << "\n";
         // std::cout << base64_encode(reinterpret_cast<const unsigned char*>(ret.c_str()), ret.length()) << "\n";
         // reinterpret_cast<const unsigned char*>(s.c_str()), s.length())
-        std::cout << "after bp" << "\n";
+        // std::cout << "after bp" << "\n";
 
 	delete params;
 
 
+        std::string ret(bp->data, bp->size);
 
         // push qrcode and id to array so they can be converted to js object in onOk()
         pointerToSvgs[i] = base64_encode(reinterpret_cast<const unsigned char*>(ret.c_str()), ret.length());
