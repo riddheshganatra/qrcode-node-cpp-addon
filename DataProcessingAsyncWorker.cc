@@ -180,7 +180,7 @@ std::string mongoObjectId()
 void DataProcessingAsyncWorker::Execute()
 {
 
-    std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;
+    // std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;
 
     for (int i = 0; i < count; i++)
     {
@@ -312,7 +312,7 @@ void DataProcessingAsyncWorker::OnOK()
     
 	    napi_set_element(this->Env(), qrcodeArray, i, tempObj);
     }
-    	std::cout << "DataProcessingAsyncWorker: DONE" << std::endl;
+    	// std::cout << "DataProcessingAsyncWorker: DONE" << std::endl;
 
     Callback().Call({
         qrcodeArray
