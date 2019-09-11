@@ -309,8 +309,10 @@ void DataProcessingAsyncWorker::OnOK()
         tempObj.Set(Napi::String::New(this->Env(), "svg"), svgString);
         tempObj.Set(Napi::String::New(this->Env(), "id"), uid);
         tempObj.Set(Napi::String::New(this->Env(), "hash"), hashedUid);
-        napi_set_element(this->Env(), qrcodeArray, i, tempObj);
+    
+	    napi_set_element(this->Env(), qrcodeArray, i, tempObj);
     }
+    	// std::cout << "DataProcessingAsyncWorker: DONE" << std::endl;
 
     Callback().Call({
         qrcodeArray
