@@ -182,7 +182,7 @@ std::string mongoObjectId()
 void DataProcessingAsyncWorker::Execute()
 {
 
-    // std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;
+    std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;
 
     for (int i = 0; i < count; i++)
     {
@@ -190,10 +190,11 @@ void DataProcessingAsyncWorker::Execute()
         pointerToUids[i] = mongoObjectId();
 
         pointerToHashedUids[i] = picosha2::hash256_hex_string(pointerToUids[i]);
+    // std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;
+
         
-		std::string args = linkPrefix.append(pointerToHashedUids[i]);
         // generate qrcode logic
-	Qrc_Params* params = ValidateArgs(args.append(linkPostfix));
+		Qrc_Params* params = ValidateArgs(linkPrefix + pointerToHashedUids[i] + linkPostfix);
 
         QRcode *code = Encode(params);
 		Qrc_Png_Buffer* bp = new Qrc_Png_Buffer();
