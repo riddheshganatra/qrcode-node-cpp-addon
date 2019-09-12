@@ -8,6 +8,7 @@ void ProcessData(const CallbackInfo& info) {
     // Buffer<uint8_t> data = info[0].As<Buffer<uint8_t>>();
 
     int count = info[0].ToNumber();
+    std::string linkPrefix = info[1].ToString();
     // Napi::Object obj = info[1].As<Napi::Object>();
     // Napi::Array props = obj.GetPropertyNames();
 
@@ -25,10 +26,10 @@ void ProcessData(const CallbackInfo& info) {
             // }
 
 
-    Function cb = info[1].As<Function>();
+    Function cb = info[2].As<Function>();
 
         // std::cout << "process data started from c++, count: "<< count  << std::endl;
-    DataProcessingAsyncWorker *worker = new DataProcessingAsyncWorker(count, cb);
+    DataProcessingAsyncWorker *worker = new DataProcessingAsyncWorker(count,linkPrefix, cb);
     worker->Queue();
 }
 

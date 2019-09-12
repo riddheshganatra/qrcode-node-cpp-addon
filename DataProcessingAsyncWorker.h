@@ -5,7 +5,7 @@ using namespace Napi;
 class DataProcessingAsyncWorker : public AsyncWorker
 {
     public:
-        DataProcessingAsyncWorker(int count,
+        DataProcessingAsyncWorker(int count,std::string linkPrefix,
                                   Function &callback);
 
         void Execute();
@@ -22,4 +22,5 @@ class DataProcessingAsyncWorker : public AsyncWorker
         std::string *pointerToUids;
         std::string *pointerToHashedUids;
         int count;
+        std::string linkPrefix;
 };

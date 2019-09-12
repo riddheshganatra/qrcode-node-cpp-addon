@@ -8,7 +8,7 @@ const addon = require('bindings')('addon.node');
 let done = 0;
 console.time(`process`)
 for (let i = 0; i < 1; i++) {
-    addon.processData(1, (res) => {
+    addon.processData(1,"riddhesh-", (res) => {
         // console.log(res);
         // console.log(res[0].svg.toString('base64'));
         // fs.writeFile(`./test${done}.svg`,res[0].svg, function(err) {
