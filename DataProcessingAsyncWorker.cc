@@ -182,7 +182,7 @@ std::string mongoObjectId()
 void DataProcessingAsyncWorker::Execute()
 {
 
-    std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;
+    // std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;
 
     for (int i = 0; i < count; i++)
     {
