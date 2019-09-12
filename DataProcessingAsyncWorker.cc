@@ -39,7 +39,7 @@ struct Qrc_Params {
 
 	Qrc_Params(const std::string &p_data, QRecLevel p_ec_level = QR_ECLEVEL_L, QRencodeMode p_mode = QR_MODE_8,
 			int p_version = 0,
-			int p_dot_size = 3, int p_margin = 4,
+			int p_dot_size = 10, int p_margin = 4,
 			int p_foreground_color = 0x0, int p_background_color = 0xffffff) {
 		datalen = p_data.length();
 		data = new unsigned char[datalen + 1];
