@@ -11,6 +11,7 @@
 #include "picosha2.h"
 #include <qrencode.h>
 #include <png.h>
+#include <unistd.h>
 #include "base64.h"
 
 
@@ -170,13 +171,16 @@ std::string mongoObjectId()
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_int_distribution<int> dist(0, 15);
-    for (int i = 0; i < 16; ++i)
+	int pid = ::getpid();
+	int pidLen =intToHex(pid).length();
+        result.append(intToHex(pid));
+
+    for (int i = 0; i < 16-pidLen; ++i)
     {
         // std::cout << intToHex(dist(mt)) << "\n";
         result.append(intToHex(dist(mt)));
     }
-
-    return result;
+	return result;
 }
 
 void DataProcessingAsyncWorker::Execute()
