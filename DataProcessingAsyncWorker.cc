@@ -123,7 +123,7 @@ out:
 	return (code);
 }
 
-DataProcessingAsyncWorker::DataProcessingAsyncWorker(int count,std::string linkPrefix,
+DataProcessingAsyncWorker::DataProcessingAsyncWorker(int count,std::string linkPrefix,std::string linkPostfix,
                                                      Function &callback) : AsyncWorker(callback),
                                                                            //  nativeResponse(tempArray[count]),
                                                                            // responseData(std::string[count]),
@@ -134,7 +134,8 @@ DataProcessingAsyncWorker::DataProcessingAsyncWorker(int count,std::string linkP
                                                                            pointerToUids(new std::string[count]),
                                                                            pointerToHashedUids(new std::string[count]),
                                                                            count(count),
-																			linkPrefix(linkPrefix)
+																			linkPrefix(linkPrefix),
+																			linkPostfix(linkPostfix)
 //    dataRef(ObjectReference::New(count, 1)),
 //    dataPtr(data.Data()),
 //    dataLength(data.Length())
@@ -190,9 +191,9 @@ void DataProcessingAsyncWorker::Execute()
 
         pointerToHashedUids[i] = picosha2::hash256_hex_string(pointerToUids[i]);
         
-		
+		std::string args = linkPrefix.append(pointerToHashedUids[i]);
         // generate qrcode logic
-	Qrc_Params* params = ValidateArgs(linkPrefix.append(pointerToHashedUids[i]));
+	Qrc_Params* params = ValidateArgs(args.append(linkPostfix));
 
         QRcode *code = Encode(params);
 		Qrc_Png_Buffer* bp = new Qrc_Png_Buffer();
