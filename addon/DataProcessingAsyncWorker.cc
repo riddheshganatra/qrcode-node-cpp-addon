@@ -13,15 +13,16 @@
 #include <png.h>
 #include <unistd.h>
 #include "base64.h"
+#include <thread>
 
-// #include <bits/stdc++.h>
-
-// using namespace uuids;
 using namespace std::chrono;
 
 #ifndef QRSPEC_VERSION_MAX
 #define QRSPEC_VERSION_MAX 40
 #endif
+
+// start of qrcode helper function
+//* code copied from existing package https://github.com/netoxygen/node-qrcodeine
 
 const unsigned int QRC_MAX_SIZE[] = {2938, 2319, 1655, 1268};
 const int32_t COLOR_MAX = 0xFFFFFF;
@@ -129,35 +130,10 @@ out:
 	QRinput_free(input);
 	return (code);
 }
+// end of qrcode helper function
 
-DataProcessingAsyncWorker::DataProcessingAsyncWorker(int count, std::string linkPrefix, std::string linkPostfix,
-													 Function &callback) : AsyncWorker(callback),
-																		   //  nativeResponse(tempArray[count]),
-																		   // responseData(std::string[count]),
-																		   // responseData(Napi::Persistent(Napi::Object::New(Env()))),
-
-																		   //    result(Object::New(Env())),
-																		   pointerToSvgs(new std::string[count]),
-																		   pointerToUids(new std::string[count]),
-																		   pointerToHashedUids(new std::string[count]),
-																		   count(count),
-																		   linkPrefix(linkPrefix),
-																		   linkPostfix(linkPostfix)
-//    dataRef(ObjectReference::New(count, 1)),
-//    dataPtr(data.Data()),
-//    dataLength(data.Length())
-{
-	// pointerToResponse = new std::string [count];
-}
-
-unsigned int random_char()
-{
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> dis(0, 255);
-	return dis(gen);
-}
-
+// generate random mongo id using below reference, also have added logic for pid
+// * reference from: https://gist.github.com/solenoid/1372386
 std::string intToHex(int number)
 {
 	std::stringstream sstream;
@@ -167,7 +143,7 @@ std::string intToHex(int number)
 
 	return result;
 }
-std::string mongoObjectId()
+std::string mongoObjectId(int batchNumber)
 {
 	milliseconds ms = duration_cast<milliseconds>(
 		system_clock::now().time_since_epoch());
@@ -176,11 +152,13 @@ std::string mongoObjectId()
 	std::random_device rd;
 	std::mt19937 mt(rd());
 	std::uniform_int_distribution<int> dist(0, 15);
-	int pid = ::getpid();
-	int pidLen = intToHex(pid).length();
-	result.append(intToHex(pid));
 
-	for (int i = 0; i < 16 - pidLen; ++i)
+	std::string hexBatchNo = intToHex(batchNumber);
+
+	int batchLen = hexBatchNo.length();
+	result.append(hexBatchNo);
+
+	for (int i = 0; i < 16 - batchLen; ++i)
 	{
 		// std::cout << intToHex(dist(mt)) << "\n";
 		result.append(intToHex(dist(mt)));
@@ -188,15 +166,27 @@ std::string mongoObjectId()
 	return result;
 }
 
+// *code reference from : https://codemerx.com/blog/asynchronous-c-addon-for-node-js-with-n-api-and-node-addon-api/
+DataProcessingAsyncWorker::DataProcessingAsyncWorker(int count, std::string linkPrefix, std::string linkPostfix, int batchNumber,
+													 Function &callback) : AsyncWorker(callback),
+																		   pointerToSvgs(new std::string[count]),
+																		   pointerToUids(new std::string[count]),
+																		   pointerToHashedUids(new std::string[count]),
+																		   count(count),
+																		   batchNumber(batchNumber),
+																		   linkPrefix(linkPrefix),
+																		   linkPostfix(linkPostfix)
+{
+	// pointerToResponse = new std::string [count];
+}
+
 void DataProcessingAsyncWorker::Execute()
 {
-
-	// std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;
 
 	for (int i = 0; i < count; i++)
 	{
 		// generate new uuid
-		pointerToUids[i] = mongoObjectId();
+		pointerToUids[i] = mongoObjectId(batchNumber);
 
 		pointerToHashedUids[i] = picosha2::hash256_hex_string(pointerToUids[i]);
 		// std::cout << "DataProcessingAsyncWorker: started " << count << std::endl;

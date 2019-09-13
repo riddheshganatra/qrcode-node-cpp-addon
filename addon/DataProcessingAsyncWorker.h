@@ -4,24 +4,23 @@ using namespace Napi;
 
 class DataProcessingAsyncWorker : public AsyncWorker
 {
-    public:
-        DataProcessingAsyncWorker(int count,std::string linkPrefix,std::string linkPostfix,
-                                  Function &callback);
+public:
+    DataProcessingAsyncWorker(int count, std::string linkPrefix, std::string linkPostfix, int batchNumber,
+                              Function &callback);
 
-        void Execute();
+    void Execute();
 
-        void OnOK();
+    void OnOK();
 
-    private:
-        // ObjectReference dataRef;
-        // uint8_t *dataPtr;
-        // size_t dataLength;
-        // Napi::ObjectReference responseData;
-        // std::string responseData[];
-        std::string *pointerToSvgs;
-        std::string *pointerToUids;
-        std::string *pointerToHashedUids;
-        int count;
-        std::string linkPrefix;
-        std::string linkPostfix;
+private:
+    // variables to convert c++ to js objects
+    std::string *pointerToSvgs;
+    std::string *pointerToUids;
+    std::string *pointerToHashedUids;
+
+    // parameters from js to c++
+    int count;
+    int batchNumber;
+    std::string linkPrefix;
+    std::string linkPostfix;
 };
