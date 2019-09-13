@@ -2,7 +2,7 @@
   'targets': [
     {
       'target_name': 'addon',
-      'sources': [ 'Addon.cc', 'DataProcessingAsyncWorker.cc','base64.cc' ],
+      'sources': [ 'addon/Addon.cc', 'addon/DataProcessingAsyncWorker.cc','dependencies/base64.cc' ],
      "libraries": ["-lqrencode", "-lpng"],
       "conditions":[
                 ['OS=="mac"',{
@@ -13,7 +13,7 @@
             ],
             'cflags!': [ '-fno-exceptions' ],
 'cflags_cc!': [ '-fno-exceptions' ],
-      'include_dirs': ["<!@(node -p \"require('node-addon-api').include\")", "./"],
+      'include_dirs': ["<!@(node -p \"require('node-addon-api').include\")", "./addon","./dependencies"],
       'dependencies': ["<!(node -p \"require('node-addon-api').gyp\")"],
       'defines': [ 'NAPI_DISABLE_CPP_EXCEPTIONS' ]
     }
