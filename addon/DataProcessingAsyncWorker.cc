@@ -317,6 +317,11 @@ void DataProcessingAsyncWorker::OnOK()
 
 		napi_set_element(this->Env(), qrcodeArray, i, tempObj);
 	}
+
+	//  free memory for class
+	delete pointerToSvgs;
+	delete pointerToUids;
+	delete pointerToHashedUids;
 	// std::cout << "DataProcessingAsyncWorker: DONE" << std::endl;
 
 	Callback().Call({
