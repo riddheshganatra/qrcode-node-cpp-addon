@@ -24,8 +24,8 @@ using namespace std::chrono;
 // start of qrcode helper function
 //* code copied from existing package https://github.com/netoxygen/node-qrcodeine
 
-const unsigned int QRC_MAX_SIZE[] = {2938, 2319, 1655, 1268};
-const int32_t COLOR_MAX = 0xFFFFFF;
+// const unsigned int QRC_MAX_SIZE[] = {2938, 2319, 1655, 1268};
+// const int32_t COLOR_MAX = 0xFFFFFF;
 
 struct Qrc_Params
 {
@@ -254,7 +254,6 @@ void DataProcessingAsyncWorker::Execute()
 		png_destroy_write_struct(&png_ptr, &info_ptr);
 
 		delete[] row;
-		delete[] bp;
 		free(png_plte);
 
 		// std::cout << bp->data << "\n";
@@ -267,9 +266,12 @@ void DataProcessingAsyncWorker::Execute()
 		delete params;
 
 		std::string ret(bp->data, bp->size);
-
+		// delete[] bp;
 		// push qrcode and id to array so they can be converted to js object in onOk()
 		pointerToSvgs[i] = base64_encode(reinterpret_cast<const unsigned char *>(ret.c_str()), ret.length());
+
+		delete bp;
+		// delete ret;
 
 		// const uint8_t PIXELS[] = {
 		//     0xFF,
@@ -320,9 +322,9 @@ void DataProcessingAsyncWorker::OnOK()
 	}
 
 	//  free memory for class
-	free(pointerToSvgs);
-	free(pointerToUids);
-	free(pointerToHashedUids);
+	delete[] pointerToSvgs;
+	delete[] pointerToUids;
+	delete[] pointerToHashedUids;
 	// std::cout << "DataProcessingAsyncWorker: DONE" << std::endl;
 
 	Callback().Call({
