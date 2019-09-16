@@ -271,6 +271,7 @@ void DataProcessingAsyncWorker::Execute()
 		pointerToSvgs[i] = base64_encode(reinterpret_cast<const unsigned char *>(ret.c_str()), ret.length());
 
 		delete bp;
+		QRcode_free(code);
 		// delete ret;
 
 		// const uint8_t PIXELS[] = {
