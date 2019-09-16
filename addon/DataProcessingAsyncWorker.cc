@@ -319,9 +319,9 @@ void DataProcessingAsyncWorker::OnOK()
 	}
 
 	//  free memory for class
-	delete pointerToSvgs;
-	delete pointerToUids;
-	delete pointerToHashedUids;
+	delete[] pointerToSvgs;
+	delete[] pointerToUids;
+	delete[] pointerToHashedUids;
 	// std::cout << "DataProcessingAsyncWorker: DONE" << std::endl;
 
 	Callback().Call({
