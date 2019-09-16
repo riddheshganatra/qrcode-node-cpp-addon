@@ -254,6 +254,7 @@ void DataProcessingAsyncWorker::Execute()
 		png_destroy_write_struct(&png_ptr, &info_ptr);
 
 		delete[] row;
+		delete[] bp;
 		free(png_plte);
 
 		// std::cout << bp->data << "\n";
@@ -319,9 +320,9 @@ void DataProcessingAsyncWorker::OnOK()
 	}
 
 	//  free memory for class
-	delete[] pointerToSvgs;
-	delete[] pointerToUids;
-	delete[] pointerToHashedUids;
+	free(pointerToSvgs);
+	free(pointerToUids);
+	free(pointerToHashedUids);
 	// std::cout << "DataProcessingAsyncWorker: DONE" << std::endl;
 
 	Callback().Call({
