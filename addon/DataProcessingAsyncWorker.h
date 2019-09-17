@@ -5,8 +5,7 @@ using namespace Napi;
 class DataProcessingAsyncWorker : public AsyncWorker
 {
 public:
-    DataProcessingAsyncWorker(int count, std::string linkPrefix, std::string linkPostfix, int batchNumber,
-                              Function &callback);
+    DataProcessingAsyncWorker(int count, std::string linkPrefix, std::string linkPostfix, int batchNumber, std::string batchId, Function &callback);
 
     void Execute();
 
@@ -22,5 +21,6 @@ private:
     int count;
     int batchNumber;
     std::string linkPrefix;
+    std::string batchId;
     std::string linkPostfix;
 };

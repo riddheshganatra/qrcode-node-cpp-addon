@@ -8,7 +8,7 @@ const addon = require('bindings')('addon.node');
 let done = 0;
 console.time(`process`)
 for (let i = 0; i < 6; i++) {
-    addon.processData(1000, "riddhesh-", "ganatra", i, (res) => {
+    addon.processData(10, "riddhesh-", "ganatra", i, "resultpngs", (res) => {
         // console.log(res.length);
         // console.log(res[0].svg);
         // console.log(res[0].svg.toString('base64'));

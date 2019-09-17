@@ -1,4 +1,6 @@
 #include <DataProcessingAsyncWorker.h>
+#include <fstream>
+// #include <bits/stdc++.h>
 // #include "uuid.h"
 #include <string.h>
 #include <iostream>
@@ -16,6 +18,7 @@
 #include <thread>
 
 using namespace std::chrono;
+using std::fstream;
 
 #ifndef QRSPEC_VERSION_MAX
 #define QRSPEC_VERSION_MAX 40
@@ -26,6 +29,7 @@ using namespace std::chrono;
 
 // const unsigned int QRC_MAX_SIZE[] = {2938, 2319, 1655, 1268};
 // const int32_t COLOR_MAX = 0xFFFFFF;
+// compression https://www.codeproject.com/Articles/8212/Zip-bytes-in-memory-and-unzip-file-into-bytes-buff
 
 struct Qrc_Params
 {
@@ -167,7 +171,7 @@ std::string mongoObjectId(int batchNumber)
 }
 
 // *code reference from : https://codemerx.com/blog/asynchronous-c-addon-for-node-js-with-n-api-and-node-addon-api/
-DataProcessingAsyncWorker::DataProcessingAsyncWorker(int count, std::string linkPrefix, std::string linkPostfix, int batchNumber,
+DataProcessingAsyncWorker::DataProcessingAsyncWorker(int count, std::string linkPrefix, std::string linkPostfix, int batchNumber, std::string batchId,
 													 Function &callback) : AsyncWorker(callback),
 																		   pointerToSvgs(new std::string[count]),
 																		   pointerToUids(new std::string[count]),
@@ -175,6 +179,7 @@ DataProcessingAsyncWorker::DataProcessingAsyncWorker(int count, std::string link
 																		   count(count),
 																		   batchNumber(batchNumber),
 																		   linkPrefix(linkPrefix),
+																		   batchId(batchId),
 																		   linkPostfix(linkPostfix)
 {
 	// pointerToResponse = new std::string [count];
@@ -182,9 +187,15 @@ DataProcessingAsyncWorker::DataProcessingAsyncWorker(int count, std::string link
 
 void DataProcessingAsyncWorker::Execute()
 {
+	// fstream file;
+	// file.open("foo.zip", fstream::out);
+	// file.close();
+
+	// std::cout << std::thread::hardware_concurrency() << std::endl;
 
 	for (int i = 0; i < count; i++)
 	{
+
 		// generate new uuid
 		pointerToUids[i] = mongoObjectId(batchNumber);
 
@@ -270,6 +281,20 @@ void DataProcessingAsyncWorker::Execute()
 		// push qrcode and id to array so they can be converted to js object in onOk()
 		pointerToSvgs[i] = base64_encode(reinterpret_cast<const unsigned char *>(ret.c_str()), ret.length());
 
+		std::cout << ("./" + batchId + "/" + pointerToUids[i] + ".png").c_str() << "\n";
+		std::ofstream outfile(("./" + batchId + "/" + pointerToUids[i] + ".png").c_str(), std::ofstream::binary);
+		outfile.write(bp->data, bp->size);
+		outfile.close();
+
+		// std::ofstream myfile;
+		// myfile.open((pointerToUids[i] + ".png").c_str());
+		// myfile << bp->data;
+		// myfile.close();
+
+		// {
+
+		// }
+
 		delete bp;
 		QRcode_free(code);
 		// delete ret;
@@ -295,6 +320,10 @@ void DataProcessingAsyncWorker::Execute()
 		//     0xFF,
 		// };
 	}
+	// if (batchNumber == 1)
+	// {
+
+	// }
 }
 
 void DataProcessingAsyncWorker::OnOK()

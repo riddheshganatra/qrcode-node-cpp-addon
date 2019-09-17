@@ -12,10 +12,11 @@ void ProcessData(const CallbackInfo &info)
     std::string linkPrefix = info[1].ToString();
     std::string linkPostfix = info[2].ToString();
     int batchNumber = info[3].ToNumber();
-    Function cb = info[4].As<Function>();
+    std::string batchId = info[4].ToString();
+    Function cb = info[5].As<Function>();
 
     // std::cout << "process data started from c++, count: "<< count  << std::endl;
-    DataProcessingAsyncWorker *worker = new DataProcessingAsyncWorker(count, linkPrefix, linkPostfix, batchNumber, cb);
+    DataProcessingAsyncWorker *worker = new DataProcessingAsyncWorker(count, linkPrefix, linkPostfix, batchNumber, batchId, cb);
     worker->Queue();
 }
 
