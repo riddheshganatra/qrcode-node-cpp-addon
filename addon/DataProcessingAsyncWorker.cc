@@ -284,7 +284,7 @@ void DataProcessingAsyncWorker::Execute()
 		if (batchId != "")
 		{
 
-			std::cout << ("./" + batchId + "/" + pointerToUids[i] + ".png").c_str() << "\n";
+			// std::cout << ("./" + batchId + "/" + pointerToUids[i] + ".png").c_str() << "\n";
 			std::ofstream outfile(("./" + batchId + "/" + pointerToUids[i] + ".png").c_str(), std::ofstream::binary);
 			outfile.write(bp->data, bp->size);
 			outfile.close();
