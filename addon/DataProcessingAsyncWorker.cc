@@ -281,10 +281,14 @@ void DataProcessingAsyncWorker::Execute()
 		// push qrcode and id to array so they can be converted to js object in onOk()
 		pointerToSvgs[i] = base64_encode(reinterpret_cast<const unsigned char *>(ret.c_str()), ret.length());
 
-		std::cout << ("./" + batchId + "/" + pointerToUids[i] + ".png").c_str() << "\n";
-		std::ofstream outfile(("./" + batchId + "/" + pointerToUids[i] + ".png").c_str(), std::ofstream::binary);
-		outfile.write(bp->data, bp->size);
-		outfile.close();
+		if (batchId != "")
+		{
+
+			std::cout << ("./" + batchId + "/" + pointerToUids[i] + ".png").c_str() << "\n";
+			std::ofstream outfile(("./" + batchId + "/" + pointerToUids[i] + ".png").c_str(), std::ofstream::binary);
+			outfile.write(bp->data, bp->size);
+			outfile.close();
+		}
 
 		// std::ofstream myfile;
 		// myfile.open((pointerToUids[i] + ".png").c_str());
